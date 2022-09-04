@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>메뉴관리</title>
+    <link rel="stylesheet" href="/node_modules/tui-time-picker/dist/tui-time-picker.css">
+    <link rel="stylesheet" href="/node_modules/tui-date-picker/dist/tui-date-picker.css">
+    <link rel="stylesheet" href="/node_modules/tui-grid/dist/tui-grid.css">
+    <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <script src="/node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="/node_modules/tui-code-snippet/tui-code-snippet.min.js"></script>
+    <script src="/node_modules/tui-time-picker/dist/tui-time-picker.min.js"></script>
+    <script src="/node_modules/tui-date-picker/dist/tui-date-picker.min.js"></script>
+    <script src="/node_modules/tui-grid/dist/tui-grid.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+</head>
+<style>
+    * { margin: 0 auto; }
+</style>
+<body>
+<script>
+
+var grid;
+var isUrl = "http://localhost:8081";
+var storeId= "123" // 일단 하드코딩 . jwt 는 포기 . 페이지 이동시 넘김 ?
+
+$(function() {
+
+
+  searchKitchen();
+
+
+
+    $('#update').click(function(){
+
+        var menuNm = $('#menuNm').val();
+        var menuId = $('#menuId').val();
+        var amt = $('#amt').val();
+        var qty = $('#qty').val();
+
+
+
+
+    });
+
+})
+function searchKitchen(){
+  $('#kitchen-tbody').empty();
+      axios
+          .get( isUrl + '/kitchens/' + storeId )
+          .then((res) => {
+              console.log(res.data[0]);
+              console.log(res.data.length);
+              for(var a = 0; a< res.data.length; a++){
+                var tmp =res.data[a];
+              var tr =  '<tr>' +
+                        '  <th scope="row">'+res.data[a].orderItems.menuId +'</th>' +
+                        '  <td>'+ res.data[a].orderItems.quantity+'</td>' +
+                        '  <td>'+ res.data[a].status +'</td>' +
+                        '  <td><button type="submit" onClick="statusApi(this)" data-orderId ="'+tmp.orderId
+                          +'"  data-status ="'+tmp.status+'" data-id ="'+tmp.id+'" data-nextStep ="'+tmp.nextStep+'">'+res.data[a].nextStep +'</button></td>' +
+                        '</tr>';
+              $('#kitchen-tbody').append(tr);
+             }
+          });
+    }
+function statusApi(identifier)  {
+  console.log($(identifier).data('id'));
+    axios.put(isUrl + '/kitchens/'+parseInt($(identifier).data('id')) , {
+          id : $(identifier).data('id'),
+          status : $(identifier).data('status'),
+          nextStep : $(identifier).data('nextstep')
+        })
+        .then(function(response) {
+            console.log("성공");
+            console.log(response.data);
+            // this.searchKitchen();
+        })
+        .catch(function(error) {
+            console.log("ㅠㅠ");
+        })
+        .finally(function(){
+          searchKitchen();
+        })
+  }
+</script>
+
+  <div id="wrap" style="width: 90%;">
+    <div>
+        <div style="display: flex; flex-flow: row nowrap; margin-top: 20px; margin-bottom: 20px;">
+            <div style="width: 33%;"><img src="/node_modules/bootstrap-icons/icons/stars.svg">주방</div>
+        </div>
+    </div>
+    <!-- <div id="grid" style="width: 90%;"></div> -->
+    <div>
+        <table id="kitchen-table" class="table table-striped table-hover">
+            <thead>
+              <tr>
+                <th scope="col">메뉴명</th>
+                <th scope="col">수량</th>
+                <th scope="col">주문상태</th>
+                <th scope="col">상태변경</th>
+              </tr>
+            </thead>
+            <tbody id="kitchen-tbody">
+
+            </tbody>
+          </table>
+      </div>
+  </div>
+
+</body>
+</html>
