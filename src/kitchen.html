@@ -57,17 +57,17 @@ function searchKitchen(){
                   statusName ="주문요청"
                 }else if(tmp.status == "cooking"){
                   statusName ="조리중"
-                }else if(tmp.status == "cookingFinished"){
+                }else if(tmp.status == "cooked"){
                   statusName ="조리완료"
                 }else if(tmp.status == "served"){
                   statusName ="서빙완료"
-                }else if(tmp.status ="cancel"){
+                }else if(tmp.status ="canceled"){
                   statusName = "주문 취소"
                 }
 
                 if(tmp.nextStep == "approved"){
                   nextStepName = "주문승인";
-                }else if(tmp.nextStep == "cookingFinish"){
+                }else if(tmp.nextStep == "cooked"){
                   nextStepName ="조리완료";
                 }else if(tmp.nextStep == "serveRequest"){
                   nextStepName ="서빙";
@@ -81,7 +81,7 @@ function searchKitchen(){
                           var trButtonCancel ="";
                   if(tmp.status == "orderRequest"){
                     trButtonCancel =  '<a>  </a><button type="submit" onClick="statusApi(this)" data-orderId ="'+tmp.orderId
-                          +'"  data-status ="cancel" data-id ="'+tmp.id+'" data-nextStep ="none">'+'거절' +'</button>';
+                          +'"  data-status ="canceled" data-id ="'+tmp.id+'" data-nextStep ="none">'+'거절' +'</button>';
                   }
                    if(tmp.nextStep != "none"){
                           trButton=
