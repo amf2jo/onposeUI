@@ -19,7 +19,7 @@
 
 var grid;
 var isUrl = "http://localhost:8081";
-var storeId= "123" // 일단 하드코딩 . jwt 는 포기 . 페이지 이동시 넘김 ?
+var storeId= "120120" // 일단 하드코딩 . jwt 는 포기 . 페이지 이동시 넘김 ?
 
 $(function() {
 
@@ -38,6 +38,7 @@ $(function() {
 
 
 
+
     });
 
 })
@@ -50,14 +51,52 @@ function searchKitchen(){
               console.log(res.data.length);
               for(var a = 0; a< res.data.length; a++){
                 var tmp =res.data[a];
-              var tr =  '<tr>' +
-                        '  <th scope="row">'+res.data[a].orderItems.menuId +'</th>' +
-                        '  <td>'+ res.data[a].orderItems.quantity+'</td>' +
-                        '  <td>'+ res.data[a].status +'</td>' +
-                        '  <td><button type="submit" onClick="statusApi(this)" data-orderId ="'+tmp.orderId
-                          +'"  data-status ="'+tmp.status+'" data-id ="'+tmp.id+'" data-nextStep ="'+tmp.nextStep+'">'+res.data[a].nextStep +'</button></td>' +
-                        '</tr>';
-              $('#kitchen-tbody').append(tr);
+                var statusName = tmp.status;
+                var nextStepName = tmp.nextStep;
+                if(tmp.status == "orderRequest"){
+                  statusName ="주문요청"
+                }else if(tmp.status == "cooking"){
+                  statusName ="조리중"
+                }else if(tmp.status == "cookingFinished"){
+                  statusName ="조리완료"
+                }else if(tmp.status == "served"){
+                  statusName ="서빙완료"
+                }else if(tmp.status ="cancel"){
+                  statusName = "주문 취소"
+                }
+
+                if(tmp.nextStep == "approved"){
+                  nextStepName = "주문승인";
+                }else if(tmp.nextStep == "cookingFinish"){
+                  nextStepName ="조리완료";
+                }else if(tmp.nextStep == "serveRequest"){
+                  nextStepName ="서빙";
+                }
+                var tr =  '<tr>' +
+                          '  <th scope="row">'+res.data[a].orderItems.menuId +'</th>' +
+                          '  <td>'+ res.data[a].orderItems.quantity+'</td>' +
+                          '  <td>'+ statusName + '</td>';
+
+                          var trButton = "";
+                          var trButtonCancel ="";
+                  if(tmp.status == "orderRequest"){
+                    trButtonCancel =  '<a>  </a><button type="submit" onClick="statusApi(this)" data-orderId ="'+tmp.orderId
+                          +'"  data-status ="cancel" data-id ="'+tmp.id+'" data-nextStep ="none">'+'거절' +'</button>';
+                  }
+                   if(tmp.nextStep != "none"){
+                          trButton=
+                          '  <td><button type="submit" onClick="statusApi(this)" data-orderId ="'+tmp.orderId
+                          +'"  data-status ="'+tmp.status+'" data-id ="'+tmp.id+'" data-nextStep ="'+tmp.nextStep+'">'+nextStepName +'</button>' + trButtonCancel +
+                          '</td>' +
+                          '</tr>';
+                        }
+                          else{
+                            trButton= '<td></td>'
+                          }
+
+
+                     tr += trButton;
+                $('#kitchen-tbody').append(tr);
              }
           });
     }
