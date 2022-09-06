@@ -3,11 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <title>주문</title>
-    <!-- <script src="/node_modules/tui-time-picker/dist/tui-time-picker.min.js"></script>
-    <script src="/node_modules/tui-date-picker/dist/tui-date-picker.min.js"></script> -->
-    <!-- <script src="/node_modules/tui-grid/dist/tui-grid.min.js"></script> -->
-    <!-- <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script> -->
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tui-grid/4.21.4/tui-grid.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css">
     <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
@@ -23,7 +18,7 @@
 
 var grid;
 var grid2;
-var menuUrl = "http://localhost:8085"
+var menuUrl = "http://localhost:8085";
 var isUrl = "http://localhost:8090";
 var tableId = "1";
 
@@ -55,7 +50,7 @@ $(function() {
 
     // 로딩 시 메뉴 자동 조회
     axios
-    .get( menuUrl + '/menus/' + storeId )
+    .get( menuUrl + '/menus/store/' + storeId )
     .then((res) => {
         console.log(res.data.respdata);
         grid.resetData(res.data.respdata);
