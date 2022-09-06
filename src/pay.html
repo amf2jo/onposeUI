@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>계산대상조회</title>
+  <link rel="stylesheet" href="/node_modules/tui-time-picker/dist/tui-time-picker.css">
+  <link rel="stylesheet" href="/node_modules/tui-date-picker/dist/tui-date-picker.css">
+  <link rel="stylesheet" href="/node_modules/tui-grid/dist/tui-grid.css">
+  <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
+  <script src="/node_modules/jquery/dist/jquery.min.js"></script>
+  <script src="/node_modules/tui-code-snippet/tui-code-snippet.min.js"></script>
+  <script src="/node_modules/tui-time-picker/dist/tui-time-picker.min.js"></script>
+  <script src="/node_modules/tui-date-picker/dist/tui-date-picker.min.js"></script>
+  <script src="/node_modules/tui-grid/dist/tui-grid.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script language="javascript" type="text/javascript" src="https://stdpay.inicis.com/stdjs/INIStdPay.js" charset="UTF-8"></script>
+
+</head>
+<style>
+    * { margin: 0 auto; }
+</style>
+<body>
+<script>
+
+var grid;
+var isUrl = "http://localhost:8081";
+//var isUrl = "https://onepos-ui.netlify.app";
+
+$(function() {
+
+grid = new tui.Grid({
+      el: document.getElementById('grid'),
+      //data: dataSource,
+      scrollX: false,
+      scrollY: false,
+      rowHeaders: ['rowNum'],
+      columns: [
+       // { header: '상점ID',   name: 'storeId',    align: 'center'},
+       // { header: 'ID',       name: 'id',       align: 'center'},
+        { header: '주문메뉴',  name: 'orderId',   align: 'center'},
+        { header: '주문시간',  name: 'payDate',   align: 'center' },
+      //  { header: '결제방법',  name: 'payTool',   align: 'center' },
+      //  { header: '결제상태',  name: 'payStatus', align: 'center' },
+        { header: '수량',     name: 'qty',        align: 'center' },
+        { header: '가격',     name: 'amt',        align: 'center' },
+      //  { header: '테이블명',  name: 'tableNum',   align: 'center' },
+        { header: '총계',     name: 'price',      align: 'center' },
+      ]
+    });
+
+   searchList();
+
+})
+var myArray1 = [];
+
+function searchList(){
+    axios
+      .get( isUrl + '/pays/1' )
+      .then((res) => {
+          console.log(res.data);
+          console.log("res.data.price : " + res.data.price);
+
+          if( res.status == 200){
+            var data = res.data;
+            myArray1.push(data);
+
+            grid.resetData(myArray1);
+
+            //$('#price').val(data.price);
+
+          }
+      });
+}
+
+tui.Grid.applyTheme('normal', {
+    cell: {
+        normal: {
+            background: "#fff",
+            border: "#e0e0e0",
+            showVerticalBorder: true,
+            showHorizontalBorder: true,
+        },
+        header: {
+            background: "#eaeaea",
+            border: "#e0e0e0",
+            showVerticalBorder: true,
+            showHorizontalBorder: true,
+        },
+        rowHeader :{
+            background: "#eaeaea",
+            border: "#e0e0e0",
+            showVerticalBorder: true,
+            showHorizontalBorder: true,
+        },
+    }
+});
+
+</script>
+
+<div id="wrap" style="width: 90%;">
+  <div>
+    <div style="display: flex; flex-flow: row nowrap; margin-top: 20px; margin-bottom: 20px;">
+      <div style="width: 90%;"><img src="/node_modules/bootstrap-icons/icons/stars.svg">계산대상조회</div>
+      <div>
+        <button type="button" id="btnPay" onclick="location.href='/src/inipay.html'" class="btn btn-primary" data-bs-toggle="button">계산하기</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="grid" style="width: 90%;"></div>
+
+</div>
+
+
+</body>
+</html>
