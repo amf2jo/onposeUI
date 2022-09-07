@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>주문조회</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tui-grid/4.21.4/tui-grid.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css">
+  <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+  <script src="https://uicdn.toast.com/tui.code-snippet/latest/tui-code-snippet.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tui-grid/4.21.4/tui-grid.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+</head>
+<style>
+    * { margin: 0 auto; }
+</style>
+<body>
+<script>
+
+var grid;
+var isUrl = "http://localhost:8090";
+
+
+var getCookie = function(name) {
+var value = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
+return value? value[2] : null;
+};
+
+//var storeId = getCookie("storeId");
+var storeId = '170170';
+console.log("쿠키 storeId 저장된 값: " + storeId);
+//var orderId = getCookie("orderId");
+var orderId = '1021';
+console.log("쿠키 storeId 저장된 값: " + orderId);
+
+$(function() {
+
+grid = new tui.Grid({
+      el: document.getElementById('grid'),
+      //data: dataSource,
+      scrollX: false,
+      scrollY: false,
+      rowHeaders: ['rowNum'],
+      columns: [
+         { header: '테이블번호', name: 'tableNo', align: 'center'}
+        ,{ header: '주문상태', name: 'status', align: 'center'}
+      ]
+    });
+
+
+   searchList();
+
+   $('#orderCncl').click(function(){
+    alert("취소오류");
+    axios
+      .get( isUrl + '/orders/cancel/' + orderId )
+      .then((res) => {
+        location.href = "./order.html";
+      });
+
+    });
+
+
+})
+var myArray1 = [];
+function searchList(){
+  axios
+      .get( isUrl + '/orders/'+storeId +'/' + orderId )
+      .then((res) => {
+          console.log(res.data);
+          console.log("res.data.status : " + res.data.status);
+
+          if( res.status == 200){
+            var data = res.data;
+            myArray1.push(data);
+
+            grid.resetData(myArray1);
+
+            //$('#price').val(data.price);
+
+          }
+      });
+}
+
+tui.Grid.applyTheme('normal', {
+    cell: {
+        normal: {
+            background: "#fff",
+            border: "#e0e0e0",
+            showVerticalBorder: true,
+            showHorizontalBorder: true,
+        },
+        header: {
+            background: "#eaeaea",
+            border: "#e0e0e0",
+            showVerticalBorder: true,
+            showHorizontalBorder: true,
+        },
+        rowHeader :{
+            background: "#eaeaea",
+            border: "#e0e0e0",
+            showVerticalBorder: true,
+            showHorizontalBorder: true,
+        },
+    }
+});
+
+
+
+
+</script>
+
+<div id="wrap" style="width: 90%;">
+  <div>
+    <div style="display: flex; flex-flow: row nowrap; margin-top: 20px; margin-bottom: 20px;">
+      <div style="width: 90%;"><img src="/stars.svg">주문조회</div>
+      <div>
+        <button type="button" id="orderCncl" class="btn btn-primary" data-bs-toggle="button">주문취소</button>
+    </div>
+    </div>
+  </div>
+
+  <div id="grid" style="width: 90%;"></div>
+
+</div>
+</body>
+</html>
