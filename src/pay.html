@@ -37,7 +37,6 @@ var getCookie = function(name) {
 var orderId = getCookie("orderId");
 var tableNum = getCookie("tableNum");
 
-orderId = "1";
 //tableNum = "20";
 
 
@@ -114,8 +113,10 @@ $('#btnPay').click(function(){
 var myArray1 = [];
 
 function searchList(){
+
+   console.log($("#orderId").val());
     axios
-      .get( isUrl + '/pays/1' )
+      .get( isUrl + '/pays/'+$("#orderId").val() )
       .then((res) => {
           console.log(res.data);
           console.log("res.data.price : " + res.data.price);
@@ -166,7 +167,7 @@ tui.Grid.applyTheme('normal', {
     <div style="margin-top: 50px; margin-bottom: 20px;">
       <div class="input-group input-group-sm mb-3 disabled" style="width: 60%;">
         <span class="input-group-text" >주문번호</span>
-        <input type="text" id="orderId" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm">
+        <input type="text" id="orderId" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" onChange = "searchList();">
       </div>
       <div class="input-group input-group-sm mb-3 disabled" style="width: 60%;">
         <span class="input-group-text" >테이블번호</span>
