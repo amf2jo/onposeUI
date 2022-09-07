@@ -22,8 +22,13 @@ var grid;
 var isUrl = "http://localhost:8081";
 //var isUrl = "https://onepos-ui.netlify.app";
 
+var orderId = getCookie("orderId");
+orderId = "1";
+
+
 $(function() {
 // 상태값변경
+
   stateChange();
 
 // 안할래요
@@ -35,7 +40,7 @@ $(function() {
 
 function stateChange(){
     axios
-      .patch( isUrl + '/pays/1' )
+      .patch( isUrl + '/pays/'+ orderId )
       .then((res) => {
           console.log(res.data);
       });

@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
   <title>계산대상조회</title>
   <link rel="stylesheet" href="/node_modules/tui-time-picker/dist/tui-time-picker.css">
   <link rel="stylesheet" href="/node_modules/tui-date-picker/dist/tui-date-picker.css">
@@ -14,13 +15,31 @@
   <script src="/node_modules/tui-grid/dist/tui-grid.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script language="javascript" type="text/javascript" src="https://stdpay.inicis.com/stdjs/INIStdPay.js" charset="UTF-8"></script>
+  <script language="javascript" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/js-sha256/0.9.0/sha256.min.js"></script>
 
 </head>
 <style>
     * { margin: 0 auto; }
+
+.inipay_modal.fade:not(.show) {
+  opacity: 1 !important;
+}
+
 </style>
 <body>
 <script>
+
+var getCookie = function(name) {
+    var value = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
+    return value? value[2] : null;
+};
+
+var orderId = getCookie("orderId");
+var tableNum = getCookie("tableNum");
+
+orderId = "1";
+//tableNum = "20";
+
 
 var grid;
 var isUrl = "http://localhost:8081";
@@ -37,18 +56,59 @@ grid = new tui.Grid({
       columns: [
        // { header: '상점ID',   name: 'storeId',    align: 'center'},
        // { header: 'ID',       name: 'id',       align: 'center'},
-        { header: '주문메뉴',  name: 'orderId',   align: 'center'},
+        { header: '주문메뉴',  name: 'menuNm',   align: 'center'},
         { header: '주문시간',  name: 'payDate',   align: 'center' },
       //  { header: '결제방법',  name: 'payTool',   align: 'center' },
       //  { header: '결제상태',  name: 'payStatus', align: 'center' },
         { header: '수량',     name: 'qty',        align: 'center' },
         { header: '가격',     name: 'amt',        align: 'center' },
-      //  { header: '테이블명',  name: 'tableNum',   align: 'center' },
+      //  { header: '테이블번호',  name: 'tableNum',   align: 'center' },
         { header: '총계',     name: 'price',      align: 'center' },
       ]
     });
 
    searchList();
+
+
+// 쿠키값 세팅
+  $('#orderId').val(orderId);
+  $('#tableNum').val(tableNum);
+
+
+
+
+
+var oid = "";
+var timestamp = + new Date();
+var price = "";
+
+
+$('#btnPay').click(function(){
+
+    oid = 'INIpayTest_' + timestamp ;
+    timestamp = + new Date();
+    price = document.getElementsByName("price")[0].value;
+
+    var signatureTxt = "oid=" + oid + "&price=" + price + "&timestamp="+timestamp ;
+
+    console.log("signatureTxt : " + signatureTxt);
+
+    var signature = sha256(signatureTxt);
+
+    console.log("signatureTxt : " + signatureTxt);
+    console.log("signature : " + signature);
+    console.log("oid : " + oid);
+    console.log("timestamp : " + timestamp);
+
+    document.getElementsByName("signature")[0].value = signature;
+    document.getElementsByName("oid")[0].value = oid;
+    document.getElementsByName("timestamp")[0].value = timestamp;
+    //document.getElementsByName("mKey")[0].value = mkey;
+
+  INIStdPay.pay('SendPayForm_id');
+});
+
+
 
 })
 var myArray1 = [];
@@ -59,6 +119,7 @@ function searchList(){
       .then((res) => {
           console.log(res.data);
           console.log("res.data.price : " + res.data.price);
+          //console.log("res.data.getElementsByName : " + document.getElementsByName("price")[0].value);
 
           if( res.status == 200){
             var data = res.data;
@@ -68,9 +129,12 @@ function searchList(){
 
             //$('#price').val(data.price);
 
+            document.getElementsByName("price")[0].value = data.price ;
+
           }
       });
 }
+
 
 tui.Grid.applyTheme('normal', {
     cell: {
@@ -99,18 +163,51 @@ tui.Grid.applyTheme('normal', {
 
 <div id="wrap" style="width: 90%;">
   <div>
-    <div style="display: flex; flex-flow: row nowrap; margin-top: 20px; margin-bottom: 20px;">
-      <div style="width: 90%;"><img src="/node_modules/bootstrap-icons/icons/stars.svg">계산대상조회</div>
-      <div>
-        <button type="button" id="btnPay" onclick="location.href='/src/inipay.html'" class="btn btn-primary" data-bs-toggle="button">계산하기</button>
+    <div style="margin-top: 50px; margin-bottom: 20px;">
+      <div class="input-group input-group-sm mb-3 disabled" style="width: 60%;">
+        <span class="input-group-text" >주문번호</span>
+        <input type="text" id="orderId" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm">
+      </div>
+      <div class="input-group input-group-sm mb-3 disabled" style="width: 60%;">
+        <span class="input-group-text" >테이블번호</span>
+        <input type="text" id="tableNum" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm">
       </div>
     </div>
+    <div style="display: flex; flex-flow: row nowrap; margin-top: 20px; margin-bottom: 20px; margin-top: 50px;margin-bottom: 50px;">
+      <div style="width: 70%;"><img src="/node_modules/bootstrap-icons/icons/stars.svg">계산대상조회</div>
+      <div>
+        <button type="button" id="btnPay" class="btn btn-primary" data-bs-toggle="button">계산하기</button>
+      </div>
+    </div>
+
   </div>
 
   <div id="grid" style="width: 90%;"></div>
 
 </div>
 
+<form id="SendPayForm_id" name="" method="POST" >
 
+  <input type="hidden"  name="goodname" value="테스트" > <!-- 상품이름 -->
+  <input type="hidden"  name="buyername" value="홍길동" >
+  <input type="hidden"  name="buyertel" value="010-1234-5678" >
+  <input type="hidden"  name="buyeremail" value="test@inicis.com" >
+  <input type="hidden"  name="price" value="1000" > <!-- 상품결제요청 가격 -->
+  <input type="hidden"  name="mid" value="INIpayTest" ><!-- 에스크로테스트 : iniescrow0, 빌링(정기과금)테스트 : INIBillTst -->
+  <input type="hidden"  name="gopaymethod" value="Card" >
+  <input type="hidden"  name="mKey" value="3a9503069192f207491d4b19bd743fc249a761ed94246c8c42fed06c3cd15a33" >
+
+  <input type="hidden"  name="signature" value="f2c161a5acab97519986fcf68853c184368abb46de5d870b07765df5fc2f56fb" >
+  <input type="hidden"  name="oid" value="INIpayTest_1662423728815" > <!-- 주문번호 -->
+  <input type="hidden"  name="timestamp" value="1662423728815" >
+
+  <input type="hidden"  name="version" value="1.0" >
+  <input type="hidden"  name="currency" value="WON" >
+  <input type="hidden"  name="acceptmethod" value="below1000" ><!-- 에스크로옵션 : useescrow, 빌링(정기과금)옵션 : BILLAUTH(Card) -->
+
+  <input type="hidden"  name="returnUrl" value="http://localhost:3000/src/payOk.html" >  <!--리턴화면필요-->
+  <input type="hidden"  name="closeUrl" value="http://localhost:3000/src/pay.html" >
+
+</form>
 </body>
 </html>
