@@ -21,14 +21,33 @@ var grid2;
 var menuUrl = "http://localhost:8085";
 var isUrl = "http://localhost:8090";
 var tableId = "1";
+var orderId;
 
 var getCookie = function(name) {
 var value = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
 return value? value[2] : null;
 };
 
+/*쿠키에 세팅 한다*/
+var setCookie = function(name, value, exp) {
+var date = new Date();
+date.setTime(date.getTime() + exp*24*60*60*1000);
+document.cookie = name + '=' + value + ';expires=' + date.toUTCString() + ';path=/';
+};
+
 var storeId = getCookie("storeId");
 console.log("쿠키 storeId 저장된 값: " + storeId);
+
+var orderId = getCookie("orderId");
+console.log("쿠키 orderId 저장된 값: " + orderId);
+setCookie("orderId", -1, 1);
+
+
+
+
+
+setCookie("storeId", storeId,1);
+setCookie("tableNum", tableId,1);
 
 $(function() {
     //메뉴 조회 grid
@@ -58,7 +77,6 @@ $(function() {
             { header: '메뉴명', name: 'menuNm', align: 'center' },
             { header: '가격', name: 'amt', align: 'center', formatter({value}) { return `${value}원` }},
             { header: '수량', name: 'qty', align: 'center' , editor:'text'},
-            { header: '합계', name: 'sum', align: 'center', formatter({value}) { return `${value}원` }},
             { header: '포장여부', name: 'holeflag', align: 'center' , defaultValue : '선택',
                         formatter({value}){
                             var result;
@@ -79,7 +97,7 @@ $(function() {
                             useListItemText: true
                         },
                         validation:{required: true}}
-        ],
+        ]
     });
 
 
@@ -108,7 +126,6 @@ $(function() {
         var menuId = grid.getData()[ev.rowKey].menuId;
         grid2.removeRow("menuId", menuId);
     });
-
 
     grid2.on('check', (ev) => {
         if( grid2.validate().length > 0 ){
@@ -150,20 +167,32 @@ $(function() {
         }
         else{
             axios
-            .post( isUrl + '/orders/'+storeId+'/'+tableId ,{
+            .post( isUrl + '/orders/'+storeId+'/'+tableId+'/'+holeflag,{
                 menuId: menuId,
                 menuNm: menuNm,
                 quantity: qty,
-                price : amt,
-                holeflag : holeflag
+                price : amt
             })
             .then((res) => {
-            console.log(res);
+                orderId = res.data;
+                console.log(orderId);
+                setCookie("orderId", orderId,1);
+
+                //location.href = "/pay.html";
 
             })
             .catch(function (error) {
             // 에러 핸들링
                 console.log(error);
+                $('#menuId').val('');
+                $('#menuNm').val('');
+                $('#amt').val('');
+                $('#qty').val('');
+                $('#holeflag').val('');
+                console.log($('#menuId').val() +" "+$('#menuNm').val() +" "+$('#amt').val() +" "+$('#qty').val()+" "+$('#holeflag').val());
+                grid2.uncheckAll();
+                alert("주문이 실패되어 다시 주문해주세요.");
+
             })
             .then(function () {
             // // 항상 실행되는 영역 callback
@@ -226,7 +255,7 @@ tui.Grid.applyTheme('normal', {
 
     <div>
         <div style="display: flex; flex-flow: row nowrap; margin-top: 20px; margin-bottom: 20px;">
-            <div style="width: 33%;"><img src="/stars.svg">주문현황</div>
+            <div style="width: 33%;"><img src="/stars.svg">주문항목</div>
             <div>
                 <button type="button" id="order" class="btn btn-primary" data-bs-toggle="button">주문</button>
             </div>
