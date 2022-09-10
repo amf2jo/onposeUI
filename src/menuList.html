@@ -42,7 +42,8 @@ grid = new tui.Grid({
         { header: '메뉴ID', name: 'menuId', align: 'center'},
         { header: '메뉴명', name: 'menuNm', align: 'center' },
         { header: '가격', name: 'amt', align: 'center' },
-        { header: '수량', name: 'qty', align: 'center' }
+        { header: '재고수량', name: 'qty', align: 'center' },
+        { header: '평균서빙시간', name: 'servTm', align: 'center' },
       ]
     });
 
@@ -89,6 +90,7 @@ grid = new tui.Grid({
         $('#menuNm').val(grid.getData()[ev.rowKey].menuNm);
         $('#amt').val(grid.getData()[ev.rowKey].amt);
         $('#qty').val(grid.getData()[ev.rowKey].qty);
+        $('#servTm').val(grid.getData()[ev.rowKey].servTm);
 
     });
 
@@ -130,7 +132,7 @@ grid = new tui.Grid({
             return false;
         }
         if(qty == ""){
-            alert('수량을 입력하세요');
+            alert('재고수량을 입력하세요');
             return false;
         }
 

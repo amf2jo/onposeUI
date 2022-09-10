@@ -39,13 +39,13 @@ grid = new tui.Grid({
       scrollY: false,
       rowHeaders: ['rowNum'],
       columns: [
-        { header: '주문번호', name: 'orderNumber', align: 'center'},
-        { header: '메뉴명', name: 'saleMenuNm', align: 'center' },
-        { header: '판매수량', name: 'saleQty', align: 'center' },
+        { header: '주문번호', name: 'orderNumber', align: 'center' ,  width: 70},
+        { header: '메뉴명', name: 'saleMenuNm', align: 'center',  width: 70 },
+        { header: '판매수량', name: 'saleQty', align: 'center' ,  width: 70},
         { header: '판매금액', name: 'saleAmt', align: 'center' },
         { header: '주문시간', name: 'saleDtm', align: 'center' },
         { header: '완료시간', name: 'finishedDtm', align: 'center' },
-        { header: '소요시간', name: 'servTm', align: 'center' }
+        { header: '서빙소요시간', name: 'servTm', align: 'center' }
       ]
     });
 
