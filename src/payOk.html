@@ -17,10 +17,14 @@
 </style>
 <body>
 <script>
+var getCookie = function(name) {
+    var value = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
+    return value? value[2] : null;
+};
 
 var grid;
 var isUrl = "http://localhost:8081";
-//var isUrl = "https://onepos-ui.netlify.app";
+//var isUrl = "https://www.onepos2jo.ml";
 
 //var orderId = getCookie("orderId");
 orderId = "1";
@@ -28,12 +32,33 @@ orderId = "1";
 
 $(function() {
 // 상태값변경
-
-  stateChange();
+ // stateChange();
 
 // 안할래요
    $('#btnMain').click(function(){
       location.href = "./orderList.html";
+    });
+// 포인트 적립
+   $('#btnPoint').click(function(){
+
+      var usePoint  =   getCookie("usePoint");
+      var useHP     =   getCookie("useHP");
+      console.log("usePoint : " + usePoint + " // useHP : " + useHP );
+
+      axios
+        .patch( isUrl + '/points/' + useHP,{
+           customerPhoneNumber : useHP
+          ,price : usePoint
+        })
+        .then((res) => {
+            console.log("patch : "+ res.data);
+
+            if( res.status == 200){
+              console.log("success : "+ res);
+              location.href = "./orderList.html";
+            }
+        });
+
     });
 
 })

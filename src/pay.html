@@ -29,6 +29,12 @@
 <body>
 <script>
 
+var setCookie = function(name, value, exp) {
+  var date = new Date();
+  date.setTime(date.getTime() + exp*24*60*60*1000);
+  document.cookie = name + '=' + value + ';expires=' + date.toUTCString() + ';path=/';
+};
+
 var getCookie = function(name) {
     var value = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
     return value? value[2] : null;
@@ -37,16 +43,18 @@ var getCookie = function(name) {
 var orderId = getCookie("orderId");
 var tableNum = getCookie("tableNum");
 
+orderId = "1";
 //tableNum = "20";
 
-
+var usePoint = 0;
+var useHP = "";
 var grid;
 var isUrl = "http://localhost:8081";
-//var isUrl = "https://onepos-ui.netlify.app";
+//var isUrl = "https://www.onepos2jo.ml";
 
 $(function() {
 
-grid = new tui.Grid({
+  grid = new tui.Grid({
       el: document.getElementById('grid'),
       //data: dataSource,
       scrollX: false,
@@ -74,49 +82,132 @@ grid = new tui.Grid({
   $('#tableNum').val(tableNum);
 
 
+  var oid = "";
+  var timestamp = + new Date();
+  var price = "";
 
 
+  $('#btnPay').click(function(){
 
-var oid = "";
-var timestamp = + new Date();
-var price = "";
+      console.log("usePoint : " + usePoint + " // useHP : " + useHP );
+
+      if( useHP == "" || usePoint == ""){
+        alert("사용할 포인트가 조회되지 않았습니다.");
+        return false;
+      }
+
+      // 쿠키세팅
+      setCookie("usePoint", usePoint, 1);
+      setCookie("useHP", useHP, 1);
+
+      var calcPoint = $('#calcPoint').val();
+
+      // 포인트 차감처리
+      axios
+        .patch( isUrl + '/points/' + useHP + '/' + calcPoint )
+        .then((res) => {
+            console.log("patch : "+ res.data);
+
+            if( res.status == 200){
+              console.log("success : "+ res);
+            }
+        });
+
+// =============================================================================
+
+      oid = 'INIpayTest_' + timestamp ;
+      timestamp = + new Date();
+      price = document.getElementsByName("price")[0].value;
+
+      var signatureTxt = "oid=" + oid + "&price=" + price + "&timestamp="+timestamp ;
+
+      console.log("signatureTxt : " + signatureTxt);
+
+      var signature = sha256(signatureTxt);
+
+      console.log("signatureTxt : " + signatureTxt);
+      console.log("signature : " + signature);
+      console.log("oid : " + oid);
+      console.log("timestamp : " + timestamp);
+
+      document.getElementsByName("signature")[0].value = signature;
+      document.getElementsByName("oid")[0].value = oid;
+      document.getElementsByName("timestamp")[0].value = timestamp;
+      //document.getElementsByName("mKey")[0].value = mkey;
+
+    INIStdPay.pay('SendPayForm_id');
 
 
-$('#btnPay').click(function(){
+/*
+      var tempusePoint  =   getCookie("usePoint");
+      var tempuseHP     =   getCookie("useHP");
+      console.log("tempusePoint : " + tempusePoint + " // tempuseHP : " + tempuseHP );
+*/
 
-    oid = 'INIpayTest_' + timestamp ;
-    timestamp = + new Date();
-    price = document.getElementsByName("price")[0].value;
-
-    var signatureTxt = "oid=" + oid + "&price=" + price + "&timestamp="+timestamp ;
-
-    console.log("signatureTxt : " + signatureTxt);
-
-    var signature = sha256(signatureTxt);
-
-    console.log("signatureTxt : " + signatureTxt);
-    console.log("signature : " + signature);
-    console.log("oid : " + oid);
-    console.log("timestamp : " + timestamp);
-
-    document.getElementsByName("signature")[0].value = signature;
-    document.getElementsByName("oid")[0].value = oid;
-    document.getElementsByName("timestamp")[0].value = timestamp;
-    //document.getElementsByName("mKey")[0].value = mkey;
-
-  INIStdPay.pay('SendPayForm_id');
-});
+  });
 
 
+  $('#btnSearch').click(function(){
+
+    var PhoneNumber = $('#PhoneNumber').val();
+   // 01028045000
+    if( PhoneNumber == "" ){
+      alert("휴대폰번호를 입력하세요.");
+    }
+
+
+    axios
+        .get( isUrl + '/points/' + PhoneNumber )
+        .then((res) => {
+            console.log(res.data);
+
+            if( res.status == 200){
+
+              $('#PhoneNumber').val(res.data.customerPhoneNumber);
+              $('#Point').val(res.data.point);
+             // $('#calcPoint').val(res.data.calcPoint);
+             // $('#price').val(res.data.price);
+            }
+        });
+
+  });
+
+
+  $('#calcPoint').change(function(){
+    console.log( "총계 : " + grid.getData()[0].price);
+   // 01028045000
+    var grPrice = grid.getData()[0].price;  // 계산대상조회
+    var Point = $('#Point').val();          // 조회결과
+    var calcPoint = $('#calcPoint').val();  // 사용포인트
+    console.log( grPrice +"/"+ Point +"/" + calcPoint);
+
+    if( Number(Point) < Number(calcPoint) ){
+      console.log( grPrice +"/"+ Point +"/" + calcPoint);
+      alert("조회된 포인트보다 더 사용할수 없습니다. 조회 포인트:" + Point +"사용포인트:" +calcPoint);
+
+      $('#calcPoint').val('');
+      return false;
+    }
+
+    usePoint = grPrice - calcPoint;
+    useHP = $('#PhoneNumber').val();
+
+    $('#price').val(usePoint);
+
+    document.getElementsByName("price")[0].value = usePoint;
+
+  });
 
 })
+
+
+
+
 var myArray1 = [];
 
 function searchList(){
-
-   console.log($("#orderId").val());
     axios
-      .get( isUrl + '/pays/'+$("#orderId").val() )
+      .get( isUrl + '/pays/1' )
       .then((res) => {
           console.log(res.data);
           console.log("res.data.price : " + res.data.price);
@@ -166,15 +257,15 @@ tui.Grid.applyTheme('normal', {
   <div>
     <div style="margin-top: 50px; margin-bottom: 20px;">
       <div class="input-group input-group-sm mb-3 disabled" style="width: 60%;">
-        <span class="input-group-text" >주문번호</span>
-        <input type="text" id="orderId" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" onChange = "searchList();">
+        <span class="input-group-text" style="width: 120px;display: block;">주문번호</span>
+        <input type="text" id="orderId" class="form-control" style="margin-left: 10px;" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" disabled>
       </div>
       <div class="input-group input-group-sm mb-3 disabled" style="width: 60%;">
-        <span class="input-group-text" >테이블번호</span>
-        <input type="text" id="tableNum" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm">
+        <span class="input-group-text" style="width: 120px;display: block;">테이블번호</span>
+        <input type="text" id="tableNum" class="form-control" style="margin-left: 10px;" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" disabled>
       </div>
     </div>
-    <div style="display: flex; flex-flow: row nowrap; margin-top: 20px; margin-bottom: 20px; margin-top: 50px;margin-bottom: 50px;">
+    <div style="display: flex; flex-flow: row nowrap; margin-top: 20px; margin-bottom: 20px;">
       <div style="width: 70%;"><img src="/stars.svg">계산대상조회</div>
       <div>
         <button type="button" id="btnPay" class="btn btn-primary" data-bs-toggle="button">계산하기</button>
@@ -184,6 +275,33 @@ tui.Grid.applyTheme('normal', {
   </div>
 
   <div id="grid" style="width: 90%;"></div>
+
+
+  <div style="margin-top: 20px; margin-bottom: 20px;">
+    <div class="input-group input-group-sm mb-3 disabled" style="width: 60%;">
+      <span class="input-group-text" style="width: 120px;display: block;">휴대폰번호</span>
+      <input type="text" id="PhoneNumber" class="form-control" style="margin-left: 10px;" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm">
+      <div><button type="button" id="btnSearch" class="btn btn-primary" data-bs-toggle="button">조회</button></div>
+    </div>
+    <div class="input-group input-group-sm mb-3 disabled" style="width: 60%;">
+      <span class="input-group-text" style="width: 120px;display: block;">조회결과</span>
+      <input type="text" id="Point" class="form-control" style="margin-left: 10px;" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" readonly>
+    </div>
+    <div class="input-group input-group-sm mb-3 disabled" style="width: 60%;">
+      <span class="input-group-text" style="width: 120px; display: block;">사용할포인트</span>
+      <input type="text" id="calcPoint" class="form-control" style="margin-left: 10px;" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm">
+    </div>
+    <div class="input-group input-group-sm mb-3 disabled" style="width: 60%;">
+      <span class="input-group-text" style="width: 120px;display: block;">결제금액</span>
+      <input type="text" id="price" class="form-control" style="margin-left: 10px;" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" readonly>
+    </div>
+    <div style="display: flex; flex-flow: row nowrap;">
+      <div style="width: 70%;"></div>
+<!--      <div><button type="button" id="btnUsePoint" class="btn btn-primary" data-bs-toggle="button">포인트사용</button></div>-->
+
+    </div>
+  </div>
+
 
 </div>
 
@@ -206,8 +324,14 @@ tui.Grid.applyTheme('normal', {
   <input type="hidden"  name="currency" value="WON" >
   <input type="hidden"  name="acceptmethod" value="below1000" ><!-- 에스크로옵션 : useescrow, 빌링(정기과금)옵션 : BILLAUTH(Card) -->
 
-  <input type="hidden"  name="returnUrl" value="http://localhost:3000/src/payOk.html" >  <!--리턴화면필요-->
+
+  <!--배포시 Netlify 주소로 변환 필요!-->
+  <!--<input type="hidden"  name="returnUrl" value="https://onepos-ui.netlify.app/src/payOk.html" >  -->
+  <!--<input type="hidden"  name="closeUrl" value="https://onepos-ui.netlify.app/src/pay.html" >  -->
+  <input type="hidden"  name="returnUrl" value="http://localhost:3000/src/payOk.html" >
   <input type="hidden"  name="closeUrl" value="http://localhost:3000/src/pay.html" >
+
+
 
 </form>
 </body>
