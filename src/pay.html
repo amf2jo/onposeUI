@@ -43,9 +43,6 @@ var getCookie = function(name) {
 var orderId = getCookie("orderId");
 var tableNum = getCookie("tableNum");
 
-orderId = "1";
-//tableNum = "20";
-
 var usePoint = 0;
 var useHP = "";
 var grid;
@@ -207,7 +204,7 @@ var myArray1 = [];
 
 function searchList(){
     axios
-      .get( isUrl + '/pays/1' )
+      .get( isUrl + '/pays/'+orderId )
       .then((res) => {
           console.log(res.data);
           console.log("res.data.price : " + res.data.price);

@@ -20,7 +20,7 @@ var grid;
 var grid2;
 var menuUrl = "https://www.onepos2jo.ml";
 var isUrl = "https://www.onepos2jo.ml";
-var tableId = "1";
+
 var orderId;
 
 var getCookie = function(name) {
@@ -42,12 +42,9 @@ var orderId = getCookie("orderId");
 console.log("쿠키 orderId 저장된 값: " + orderId);
 setCookie("orderId", -1, 1);
 
+var tableNum = getCookie("tableNum");
+console.log("쿠키 tableNum 저장된 값: " + tableNum);
 
-
-
-
-setCookie("storeId", storeId,1);
-setCookie("tableNum", tableId,1);
 
 $(function() {
     //메뉴 조회 grid
@@ -167,7 +164,7 @@ $(function() {
         }
         else{
             axios
-            .post( isUrl + '/orders/'+storeId+'/'+tableId+'/'+holeflag,{
+            .post( isUrl + '/orders/'+storeId+'/'+tableNum+'/'+holeflag,{
                 menuId: menuId,
                 menuNm: menuNm,
                 quantity: qty,
@@ -178,7 +175,7 @@ $(function() {
                 console.log(orderId);
                 setCookie("orderId", orderId,1);
 
-                //location.href = "/pay.html";
+                location.href = "./pay.html";
 
             })
             .catch(function (error) {
