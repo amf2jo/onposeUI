@@ -86,29 +86,41 @@ $(function() {
 
   $('#btnPay').click(function(){
 
-      console.log("usePoint : " + usePoint + " // useHP : " + useHP );
+    console.log("usePoint : " + usePoint + " // useHP : " + useHP );
+    if( useHP == "" && usePoint == ""){
+      alert("사용할 포인트가 조회되지 않았습니다.");
+      return false;
+    }
 
-      if( useHP == "" || usePoint == ""){
-        alert("사용할 포인트가 조회되지 않았습니다.");
-        return false;
-      }
+    // 쿠키세팅
+    setCookie("usePoint", usePoint, 1);
+    setCookie("useHP", useHP, 1);
 
-      // 쿠키세팅
-      setCookie("usePoint", usePoint, 1);
-      setCookie("useHP", useHP, 1);
+    var calcPoint = $('#calcPoint').val();
 
-      var calcPoint = $('#calcPoint').val();
+    if( calcPoint > 0){
+    // 포인트 차감처리
+    axios
+      .patch( isUrl + '/points/' + useHP + '/' + calcPoint )
+      .then((res) => {
+          console.log("patch : "+ res.data);
 
-      // 포인트 차감처리
-      axios
-        .patch( isUrl + '/points/' + useHP + '/' + calcPoint )
-        .then((res) => {
-            console.log("patch : "+ res.data);
+          if( res.status == 200){
+            console.log("success : "+ res);
+          }
+      });
+    }
+    // 포인트 저장처리
+    axios
+    .patch( isUrl + '/points/' + useHP  )
+    .then((res) => {
+        console.log("patch : "+ res.data);
 
-            if( res.status == 200){
-              console.log("success : "+ res);
-            }
-        });
+        if( res.status == 200){
+          console.log("success : "+ res);
+        }
+  });
+
 
 // =============================================================================
 
@@ -212,6 +224,7 @@ function searchList(){
 
           if( res.status == 200){
             var data = res.data;
+            res.data.price = res.data.amt*res.data.qty;
             myArray1.push(data);
 
             grid.resetData(myArray1);
