@@ -51,11 +51,11 @@ grid = new tui.Grid({
    searchList();
 
    $('#orderCncl').click(function(){
-    alert("취소오류");
     axios
-      .get( isUrl + '/orders/cancel/' + orderId )
+      .patch( isUrl + '/orders/cancel/' + orderId )
       .then((res) => {
-        location.href = "./order.html";
+        alert("주문취소요청되었습니다.");
+        searchList();
       });
 
     });
@@ -72,13 +72,29 @@ function searchList(){
 
           if( res.status == 200){
             var data = res.data;
+            if(data.status == "orderRequest"){
+              $('#orderCncl').show();
+            }else{
+              $('#orderCncl').hide();
+            }
+
+            switch(res.data.status)
+            {
+              case "orderRequest" : res.data.status = "주문요청중"; break;
+              case "cancelRequest" : res.data.status = "주문취소요청중"; break;
+              case "cooking" : res.data.status = "조리중"; break;
+              case "canceled" : res.data.status = "취소됨"; break;
+              case "served" :  res.data.status = "완료"; break;
+            }
+
             myArray1.push(data);
 
             grid.resetData(myArray1);
 
-            //$('#price').val(data.price);
+
 
           }
+
       });
 }
 
