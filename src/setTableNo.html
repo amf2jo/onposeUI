@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>로그인</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tui-grid/4.21.4/tui-grid.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css">
+  <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+  <script src="https://uicdn.toast.com/tui.code-snippet/latest/tui-code-snippet.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tui-grid/4.21.4/tui-grid.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+  <style>
+    * { margin: 0 auto; }
+  </style>
+  <script language="javascript">
+
+
+//var storeId = 120120 ;
+//var storeTableCnt = 1 ;
+
+/*쿠키에 세팅 한다*/
+var setCookie = function(name, value, exp) {
+var date = new Date();
+date.setTime(date.getTime() + exp*24*60*60*1000);
+document.cookie = name + '=' + value + ';expires=' + date.toUTCString() + ';path=/';
+};
+var getCookie = function(name) {
+    var value = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
+    return value? value[2] : null;
+};
+
+var isUrl = "https://www.onepos2jo.ml";
+var storeId = getCookie("storeId");
+
+$(function() {
+
+  /*매장등록(회원가입) 시의 매장 테이블 수를 표시하고 선택 하도록 한다.*/
+  axios
+      .get( isUrl + '/stores/' + storeId )
+      .then((res) => {
+          console.log("매장테이블 수 : " + res.data.respdata.tableCnt);
+          var storeTableCnt = Number(res.data.respdata.tableCnt) ;
+          console.log(storeTableCnt);
+        for (tableNo = 0; tableNo < storeTableCnt ; tableNo++) {
+          let selectEl = document.querySelector("#selectEl");
+          var objOption = document.createElement("option");
+          objOption.text = tableNo+1;
+          objOption.value = tableNo+1;
+          selectEl.options.add(objOption);
+        }
+
+      });
+
+
+
+
+$('#btnJoin').click(function(){
+  setCookie("tableNum", $("#selectEl").val(), 1);
+  location.href = "./order.html";
+});
+
+
+});
+
+
+    </script>
+
+</head>
+<body>
+
+
+
+
+<div style="display: flex; flex-flow: row nowrap; margin-top: 20px; margin-bottom: 20px; width: 60%;">
+  <div style="margin-top: 20px; margin-bottom: 20px; width: 50%;">
+    테이블 번호 세팅<br>
+    <select id="selectEl">
+
+  </select>
+
+    <div><button type="button" id="btnJoin" class="btn btn-primary" data-bs-toggle="button">선택</button></div>
+  </div>
+</div>
+
+
+</body>
+</html>
