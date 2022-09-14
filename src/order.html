@@ -112,7 +112,7 @@ $(function() {
         var rowData = { menuId : grid.getData()[ev.rowKey].menuId,
                          menuNm : grid.getData()[ev.rowKey].menuNm,
                          amt : grid.getData()[ev.rowKey].amt,
-                         qty : grid.getData()[ev.rowKey].qty,
+                         qty : 1,
                          sum : Number(grid.getData()[ev.rowKey].amt)*Number(grid.getData()[ev.rowKey].qty),
                          holeflag : ''
                     };
