@@ -86,41 +86,29 @@ $(function() {
 
   $('#btnPay').click(function(){
 
-    console.log("usePoint : " + usePoint + " // useHP : " + useHP );
-    if( useHP == "" && usePoint == ""){
-      alert("사용할 포인트가 조회되지 않았습니다.");
-      return false;
-    }
+      console.log("usePoint : " + usePoint + " // useHP : " + useHP );
 
-    // 쿠키세팅
-    setCookie("usePoint", usePoint, 1);
-    setCookie("useHP", useHP, 1);
+      if( useHP == "" ){
+        alert("사용할 포인트가 조회되지 않았습니다.");
+        return false;
+      }
 
-    var calcPoint = $('#calcPoint').val();
+      // 쿠키세팅
+      setCookie("usePoint", usePoint, 1);
+      setCookie("useHP", useHP, 1);
 
-    if( calcPoint > 0){
-    // 포인트 차감처리
-    axios
-      .patch( isUrl + '/points/' + useHP + '/' + calcPoint )
-      .then((res) => {
-          console.log("patch : "+ res.data);
+      var calcPoint = $('#calcPoint').val();
 
-          if( res.status == 200){
-            console.log("success : "+ res);
-          }
-      });
-    }
-    // 포인트 저장처리
-    axios
-    .patch( isUrl + '/points/' + useHP  )
-    .then((res) => {
-        console.log("patch : "+ res.data);
+      // 포인트 차감처리
+      axios
+        .patch( isUrl + '/points/' + useHP + '/' + calcPoint )
+        .then((res) => {
+            console.log("patch : "+ res.data);
 
-        if( res.status == 200){
-          console.log("success : "+ res);
-        }
-  });
-
+            if( res.status == 200){
+              console.log("success : "+ res);
+            }
+        });
 
 // =============================================================================
 
@@ -158,28 +146,37 @@ $(function() {
 
   $('#btnSearch').click(function(){
 
-    var PhoneNumber = $('#PhoneNumber').val();
-   // 01028045000
-    if( PhoneNumber == "" ){
-      alert("휴대폰번호를 입력하세요.");
-    }
+var PhoneNumber = $('#PhoneNumber').val();
+// 01028045000
+if( PhoneNumber == "" ){
+  alert("휴대폰번호를 입력하세요.");
+}
 
 
-    axios
-        .get( isUrl + '/points/' + PhoneNumber )
-        .then((res) => {
-            console.log(res.data);
+axios
+    .get( isUrl + '/points/' + PhoneNumber )
+    .then((res) => {
+        console.log(res.data);
 
-            if( res.status == 200){
+        if( res.status == 200){
+          if(!res.data){
 
-              $('#PhoneNumber').val(res.data.customerPhoneNumber);
-              $('#Point').val(res.data.point);
-             // $('#calcPoint').val(res.data.calcPoint);
-             // $('#price').val(res.data.price);
-            }
-        });
+            console.log("신규번호");
+            $('#PhoneNumber').val(PhoneNumber);
+            useHP = $('#PhoneNumber').val();
 
-  });
+        }
+        else
+        {
+            console.log("기존번호");
+            $('#PhoneNumber').val(res.data.customerPhoneNumber);
+            $('#Point').val(res.data.point);
+
+        }
+      }
+    });
+
+});
 
 
   $('#calcPoint').change(function(){
