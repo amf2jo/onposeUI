@@ -56,8 +56,12 @@ grid = new tui.Grid({
       .then((res) => {
         alert("주문취소요청되었습니다.");
         searchList();
+        axios
+            .patch( isUrl + '/pays/refund/' + orderId )
+            .then((res) => {
+              console.log(res);
+        });
       });
-
     });
 
 
