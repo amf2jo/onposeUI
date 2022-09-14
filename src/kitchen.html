@@ -74,9 +74,19 @@ function searchKitchen(){
                 }else if(tmp.nextStep == "serveRequest"){
                   nextStepName ="서빙";
                 }
+                var menuNm = tmp.orderIems.menuId;
+                if(tmp.orderIems.menuId == "1"){
+                  menuNm = "김밥";
+                }else if(tmp.orderIems.menuId == "2"){
+                  menuNm ="쫄면";
+                }else if(tmp.orderIems.menuId == "3"){
+                  menuNm ="떡볶이";
+                }
+                
                 var tr =  '<tr>' +
                           '  <th scope="row">'+res.data[a].orderId +'</th>' +
-                          '  <th scope="row">'+res.data[a].orderItems.menuNm +'</th>' +
+                          //'  <th scope="row">'+res.data[a].orderItems.menuNm +'</th>' +
+                          '  <th scope="row">'+ menuNm +'</th>' +
                           '  <td>'+ res.data[a].orderItems.quantity+'</td>' +
                           '  <td><p class="font-weight-bold">'+ statusName + '</p></td>';
 
