@@ -74,14 +74,19 @@ function searchKitchen(){
                 }else if(tmp.nextStep == "serveRequest"){
                   nextStepName ="서빙";
                 }
-                var TmenuNm = tmp.orderItems.menuId;
-                if(tmp.orderIems.menuId == 1){
-                  TmenuNm = "김밥";
-                }else if(tmp.orderItems.menuId == 2){
-                  TmenuNm ="쫄면";
-                }else if(tmp.orderItems.menuId == 3){
+                var TmenuNm = statusName;
+                if(statusName == "조리중"){
+                  TmenuNm = "떡볶이";
+                }else if(statusName == "주문요청"){
+                  TmenuNm ="김밥";
+                }else if(statusName == "주문 취소"){
+                  TmenuNm ="떡볶이";
+                 }else if(statusName == "서빙완료"){
+                  TmenuNm ="김밥";
+                 }else if(statusName == "조리완료"){
                   TmenuNm ="떡볶이";
                  }
+                  
                 
                 var tr =  '<tr>' +
                           '  <th scope="row">'+res.data[a].orderId +'</th>' +
