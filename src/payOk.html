@@ -26,13 +26,14 @@ var grid;
 //var isUrl = "http://localhost:8081";
 var isUrl = "https://www.onepos2jo.ml";
 
-//var orderId = getCookie("orderId");
-orderId = "1";
+var orderId = getCookie("orderId");
+//orderId = "1";
+console.log("orderId : " + orderId );
 
 
 $(function() {
 // 상태값변경
- // stateChange();
+  stateChange();
 
 // 안할래요
    $('#btnMain').click(function(){
