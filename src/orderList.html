@@ -76,11 +76,11 @@ function searchList(){
 
           if( res.status == 200){
             var data = res.data;
-            if(data.status == "orderRequest"){
-              $('#orderCncl').show();
-            }else{
-              $('#orderCncl').hide();
-            }
+//             if(data.status == "orderRequest"){
+//               $('#orderCncl').show();
+//             }else{
+//               $('#orderCncl').hide();
+//             }
 
             switch(res.data.status)
             {
