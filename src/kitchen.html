@@ -74,24 +74,11 @@ function searchKitchen(){
                 }else if(tmp.nextStep == "serveRequest"){
                   nextStepName ="서빙";
                 }
-                var TmenuNm = statusName;
-                if(statusName == "조리중"){
-                  TmenuNm = "떡볶이";
-                }else if(statusName == "주문요청"){
-                  TmenuNm ="김밥";
-                }else if(statusName == "주문 취소"){
-                  TmenuNm ="떡볶이";
-                 }else if(statusName == "서빙완료"){
-                  TmenuNm ="김밥";
-                 }else if(statusName == "조리완료"){
-                  TmenuNm ="떡볶이";
-                 }
-                  
+
                 
                 var tr =  '<tr>' +
                           '  <th scope="row">'+res.data[a].orderId +'</th>' +
-                          //'  <th scope="row">'+res.data[a].orderItems.menuNm +'</th>' +
-                          '  <th scope="row">'+ TmenuNm +'</th>' +
+                          '  <th scope="row">'+res.data[a].orderItems.menuNm +'</th>' +
                           '  <td>'+ res.data[a].orderItems.quantity+'</td>' +
                           '  <td><p class="font-weight-bold">'+ statusName + '</p></td>';
 
