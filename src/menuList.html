@@ -155,7 +155,7 @@ grid = new tui.Grid({
           })
           .then(function () {
           // 항상 실행되는 영역 callback
-           axios.get('http://localhost:8085' + '/menus/store/' + storeId ).then((res) => {
+           axios.get( isUrl + '/menus/store/' + storeId ).then((res) => {
                 grid.resetData(res.data.respdata);
            });
           });
@@ -205,7 +205,7 @@ grid = new tui.Grid({
           })
           .then(function () {
           // 항상 실행되는 영역 callback
-           axios.get('http://localhost:8085' + '/menus/store/' + storeId ).then((res) => {
+           axios.get(isUrl + '/menus/store/' + storeId ).then((res) => {
                 grid.resetData(res.data.respdata);
            });
           });

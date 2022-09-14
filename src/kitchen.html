@@ -21,7 +21,15 @@ var grid;
 //var isUrl = "http://localhost:8081";
 var isUrl = "https://www.onepos2jo.ml";
 
-var storeId= "120120" // 일단 하드코딩 . jwt 는 포기 . 페이지 이동시 넘김 ?
+//var storeId= "120120" // 
+var getCookie = function(name) {
+var value = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
+return value? value[2] : null;
+};
+
+var storeId = getCookie("storeId");
+console.log("쿠키 storeId 저장된 값: " + storeId);
+
 
 $(function() {
 
@@ -75,7 +83,7 @@ function searchKitchen(){
                   nextStepName ="서빙";
                 }
 
-                
+
                 var tr =  '<tr>' +
                           '  <th scope="row">'+res.data[a].orderId +'</th>' +
                           '  <th scope="row">'+res.data[a].orderItems.menuNm +'</th>' +

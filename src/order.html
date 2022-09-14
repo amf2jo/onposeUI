@@ -56,7 +56,8 @@ $(function() {
         columns: [
             { header: '메뉴ID', name: 'menuId', align: 'center'},
             { header: '메뉴명', name: 'menuNm', align: 'center' },
-            { header: '가격', name: 'amt', align: 'center',  formatter({value}) { return `${value}원` }}
+            { header: '가격', name: 'amt', align: 'center',  formatter({value}) { return `${value}원` }},
+            { header: '평균서빙시간', name: 'servTm', align: 'center' }
         ],
         columnOptions: [ {frozenCount: 4}]
     });
