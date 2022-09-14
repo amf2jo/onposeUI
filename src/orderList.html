@@ -59,7 +59,8 @@ grid = new tui.Grid({
         axios
             .patch( isUrl + '/pays/refund/' + orderId )
             .then((res) => {
-              console.log(res);
+              alert("주문취소되었습니다.");
+              searchList();
         });
       });
     });
@@ -76,11 +77,11 @@ function searchList(){
 
           if( res.status == 200){
             var data = res.data;
-//             if(data.status == "orderRequest"){
-//               $('#orderCncl').show();
-//             }else{
-//               $('#orderCncl').hide();
-//             }
+            if(data.status == "orderRequest"){
+              $('#orderCncl').show();
+            }else{
+              $('#orderCncl').hide();
+            }
 
             switch(res.data.status)
             {
